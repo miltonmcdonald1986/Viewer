@@ -77,6 +77,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="ViewerBase.cpp" />
+    <ClCompile Include="ViewerMainFrame.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ViewerBase.h" />
+    <ClInclude Include="ViewerMainFrame.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

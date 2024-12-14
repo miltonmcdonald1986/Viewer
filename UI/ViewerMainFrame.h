@@ -18,6 +18,15 @@ class ViewerMainFrame : public MainFrame
 		ViewerMainFrame( wxWindow* parent );
 	//// end generated class members
 
+
+
+
+
+
+
+
+
+
 };
 
 #endif // __ViewerMainFrame__
