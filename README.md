@@ -2,9 +2,9 @@
 View objects in 3D
 
 ## Dependencies
+The following dependencies are required to build Viewer.
+* 7-Zip 24.09
+* wxWidgets 3.2.6
+* wxFormBuilder 4.2.1
 
-### wxWidgets 3.2.6
-* On your PC, open "x64 Native Tools Command Prompt for VS 2022". 
-* Type `powershell` and press `Enter` to start Powershell from within that console.
-* Navigate to the `scripts` directory in your clone of this repository.
-* Type `.\DownloadAndInstalWxWidgets3_2_6.ps1` and press `Enter` to obtain the wxWidgets dependency.
+To download and install all of the dependencies, open a Powershell console from the `scripts` directory, and run `DownloadAndInstallAllDependencies.ps1`.
