@@ -39,14 +39,14 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\lib\wxWidgets-3.2.6\wxwidgets.props" />
-    <Import Project="UI.props" />
     <Import Project="..\propertysheets\GLEW2_2_0.props" />
+    <Import Project="..\propertysheets\PostBuild.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\lib\wxWidgets-3.2.6\wxwidgets.props" />
-    <Import Project="UI.props" />
     <Import Project="..\propertysheets\GLEW2_2_0.props" />
+    <Import Project="..\propertysheets\PostBuild.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

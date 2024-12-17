@@ -5,7 +5,8 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <PostBuildEvent>
-      <Command>xcopy ..\lib\wxWidgets-3.2.6\lib\vc14x_x64_dll\*.dll $(OutDir) /y</Command>
+      <Command>xcopy ..\lib\glew-2.2.0\bin\Release\x64\*.dll $(OutDir) /y
+xcopy ..\lib\wxWidgets-3.2.6\lib\vc14x_x64_dll\*.dll $(OutDir) /y</Command>
     </PostBuildEvent>
     <ClCompile>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
