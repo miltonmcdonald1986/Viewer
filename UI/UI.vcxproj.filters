@@ -20,12 +20,18 @@
     <ClCompile Include="ViewerMainFrame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GLCanvas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ViewerMainFrame.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="ViewerBase.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GLCanvas.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

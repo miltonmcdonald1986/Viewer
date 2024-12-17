@@ -13,6 +13,11 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 
+	gSizer1 = new wxGridSizer( 1, 1, 0, 0 );
+
+
+	this->SetSizer( gSizer1 );
+	this->Layout();
 
 	this->Centre( wxBOTH );
 }

@@ -7,6 +7,9 @@
     <PostBuildEvent>
       <Command>xcopy ..\lib\wxWidgets-3.2.6\lib\vc14x_x64_dll\*.dll $(OutDir) /y</Command>
     </PostBuildEvent>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

@@ -10,9 +10,10 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
+#include <wx/sizer.h>
+#include <wx/gdicmn.h>
 #include <wx/string.h>
 #include <wx/frame.h>
-#include <wx/gdicmn.h>
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
@@ -27,6 +28,7 @@ class MainFrame : public wxFrame
 	private:
 
 	protected:
+		wxGridSizer* gSizer1;
 
 	public:
 
