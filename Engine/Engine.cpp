@@ -23,8 +23,16 @@ namespace Viewer
 
 	void Engine::Render() const
 	{
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(m_R, m_G, m_B, m_A);
 		glClear(GL_COLOR_BUFFER_BIT);
+	}
+
+	void Engine::SetBackgroundColor(float r, float g, float b, float a)
+	{
+		m_R = r;
+		m_G = g;
+		m_B = b;
+		m_A = a;
 	}
 
 	IEngineSPtr CreateEngine()
