@@ -10,7 +10,6 @@ class GLCanvas : public wxGLCanvas
 {
 public:
 	GLCanvas(Viewer::IEngineSPtr spEngine, wxWindow* parent, wxWindowID id = wxID_ANY, const int* attribList = NULL, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0, const wxString& name = wxGLCanvasName, const wxPalette& palette = wxNullPalette);
-
 	~GLCanvas();
 
 	// Events

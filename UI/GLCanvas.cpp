@@ -1,14 +1,8 @@
 #include "GLCanvas.h"
 
-wxBEGIN_EVENT_TABLE(GLCanvas, wxGLCanvas)
-	EVT_LEFT_DOWN(GLCanvas::OnLeftDown)
-	EVT_PAINT(GLCanvas::OnPaint)
-	EVT_SIZE(GLCanvas::OnSize)
-wxEND_EVENT_TABLE()
-
 GLCanvas::GLCanvas(Viewer::IEngineSPtr spEngine, wxWindow* parent, wxWindowID id, const int* attribList, const wxPoint& pos, const wxSize& size, long style, const wxString& name, const wxPalette& palette)
-	: m_spEngine(spEngine)
-	, wxGLCanvas(parent, id, attribList, pos, size, style, name, palette)
+	: wxGLCanvas(parent, id, attribList, pos, size, style, name, palette)
+	, m_spEngine(spEngine)
 {
 	wxGLContextAttrs glContextAttrs;
 	glContextAttrs.CoreProfile().MajorVersion(3).MinorVersion(3).Robust().ResetIsolation().EndList();
@@ -43,3 +37,9 @@ void GLCanvas::OnSize(wxSizeEvent& event)
 	glViewport(0, 0, size.x, size.y);
 	Refresh();
 }
+
+wxBEGIN_EVENT_TABLE(GLCanvas, wxGLCanvas)
+	EVT_LEFT_DOWN(GLCanvas::OnLeftDown)
+	EVT_PAINT(GLCanvas::OnPaint)
+	EVT_SIZE(GLCanvas::OnSize)
+wxEND_EVENT_TABLE()

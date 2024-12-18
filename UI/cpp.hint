@@ -1,0 +1,1 @@
+#define wxDECLARE_EVENT_TABLE() extern

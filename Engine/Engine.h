@@ -10,12 +10,20 @@ namespace Viewer
 	public:
 		Engine();
 		virtual ~Engine() override = default;
-		virtual std::string HelloWorld() const override;
+		virtual void HelloTriangle() override;
+		virtual bool Init() override;
 		virtual void Render() const override;
 		virtual void SetBackgroundColor(float r, float g, float b, float a = 1.f) override;
 
 	private:
-		bool m_Initialized = false;
+		void RenderEverything() const;
+		void RenderHelloTriangle() const;
+
+		// Info for "Hello Triangle" mode.
+		bool m_HelloTriangle = false;
+		GLuint m_IdHelloTriangleShaderProgram = 0;
+		GLuint m_HelloTriangleVAO = 0;
+		GLuint m_HelloTriangleEBO = 0;
 
 		// Background colors
 		float m_R = 0.f;

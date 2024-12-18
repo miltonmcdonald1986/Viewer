@@ -12,7 +12,8 @@ namespace Viewer
 	{
 	public:
 		virtual ~IEngine() = default;
-		virtual std::string HelloWorld() const = 0;
+		virtual void HelloTriangle() = 0;
+		virtual bool Init() = 0;
 		virtual void Render() const = 0;
 		virtual void SetBackgroundColor(float r, float g, float b, float a = 1.f) = 0;
 	};
