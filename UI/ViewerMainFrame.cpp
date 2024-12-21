@@ -12,7 +12,7 @@ MainFrame( parent )
 	// The engine has to wait to fully init until after the OpenGL context was created (in the GLCanvas constructor)
 	m_spEngine->Init();
 
-	// For a quick check that OpenGL is alive and well, uncomment 
+	// For a quick check that OpenGL is alive and well, uncomment
 	// this line and a basic triangle will appear on the GLCanvas.
 	m_spEngine->HelloTriangle();
 

@@ -10,4 +10,17 @@
 // add headers that you want to pre-compile here
 #include "framework.h"
 
+#include <filesystem>
+#include <format>
+#include <fstream>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <vector>
+
+#include "GL/glew.h"
+
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/basic_file_sink.h"
+
 #endif //PCH_H

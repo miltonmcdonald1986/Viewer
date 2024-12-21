@@ -32,6 +32,11 @@ private:
 
 
 
+
+
+
+
+
 };
 
 #endif // __ViewerMainFrame__

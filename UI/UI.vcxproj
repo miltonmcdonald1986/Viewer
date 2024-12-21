@@ -54,6 +54,8 @@
       <ShowIncludes>false</ShowIncludes>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)..\Engine\Interfaces;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -65,6 +67,10 @@
       <Command>xcopy "..\lib\wxWidgets-3.2.6\lib\vc14x_x64_dll\*.dll" $(OutDir) /y
 xcopy "..\lib\glew-2.2.0\bin\Release\x64\*.dll" $(OutDir) /y</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -76,6 +82,8 @@ xcopy "..\lib\glew-2.2.0\bin\Release\x64\*.dll" $(OutDir) /y</Command>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)..\Engine\Interfaces;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -89,12 +97,22 @@ xcopy "..\lib\glew-2.2.0\bin\Release\x64\*.dll" $(OutDir) /y</Command>
       <Command>xcopy "..\lib\wxWidgets-3.2.6\lib\vc14x_x64_dll\*.dll" $(OutDir) /y
 xcopy "..\lib\glew-2.2.0\bin\Release\x64\*.dll" $(OutDir) /y</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="GLCanvas.cpp" />
-    <ClCompile Include="ViewerBase.cpp" />
-    <ClCompile Include="ViewerMainFrame.cpp" />
+    <ClCompile Include="ViewerBase.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ViewerMainFrame.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GLCanvas.h" />

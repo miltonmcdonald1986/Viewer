@@ -1,8 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <string>
-
 #include "DllImpExp.h"
 
 namespace Viewer

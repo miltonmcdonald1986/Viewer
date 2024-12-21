@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IEngine.h"
+#include "Shader.h"
 
 namespace Viewer
 {
@@ -21,7 +22,6 @@ namespace Viewer
 
 		// Info for "Hello Triangle" mode.
 		bool m_HelloTriangle = false;
-		GLuint m_IdHelloTriangleShaderProgram = 0;
 		GLuint m_HelloTriangleVAO = 0;
 		GLuint m_HelloTriangleEBO = 0;
 
@@ -30,6 +30,9 @@ namespace Viewer
 		float m_G = 0.f;
 		float m_B = 0.f;
 		float m_A = 1.f;
+
+		// Shaders
+		std::map<std::string, Shader> m_Shaders;
 	};
 
 }
