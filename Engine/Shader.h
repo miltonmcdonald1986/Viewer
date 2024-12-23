@@ -1,28 +1,39 @@
 #pragma once
 
+#include "IShader.h"
+#include "Alias.h"
+
+using ProgramId = GLuint;
+using ShaderId = GLuint;
+using ShaderIds = std::vector<ShaderId>;
+
 namespace Viewer
 {
 
-	class Shader
+	enum class ShaderType : size_t
+	{
+		Fragment,
+		Vertex
+	};
+
+	using ShaderSources = std::map<ShaderType, Path>;
+
+	class Shader : public IShader
 	{
 	public:
+		Shader(const ShaderSources sources);
+
 		~Shader();
 
-		bool CompileFragmentShaderFromSource(const std::filesystem::path& fsPath);
-		bool CompileVertexShaderFromSource(const std::filesystem::path& vsPath);
-		bool LinkProgram();
-		bool Use() const;
+		virtual auto SetUniform(const String& name, const Vec4& value) -> bool const override;
+		virtual auto Use() -> bool const override;
 
 	private:
-		bool CompileShaderFromSource(GLenum shaderType, const std::filesystem::path& path);
-		std::optional<GLuint> CreateShader(GLenum shaderType);
-		GLuint* GetShaderData(GLenum shaderType);
-		bool SetSourceCode (int shader, const std::string& source);
+		auto LinkProgram(const ShaderIds& shaders) -> bool;
 
-		GLuint m_FragmentShader = 0;
-		GLuint m_VertexShader = 0;
-		GLuint m_Program = 0;
-		std::string m_Info;
+		bool m_Initialized = false;
+		ProgramId m_Program = 0;
+		String m_Info;
 	};
 
 }

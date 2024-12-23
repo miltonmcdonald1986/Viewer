@@ -42,13 +42,21 @@ namespace Viewer
 		// bound to GL_ARRAY_BUFFER (in this case, VBO).
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-		Shader shader;
-		shader.CompileVertexShaderFromSource(R"(..\shaders\minimal.vs)");
-		shader.CompileFragmentShaderFromSource(R"(..\shaders\minimal.fs)");
-		shader.LinkProgram();
-		shader.Use();
+		auto shadersDir = std::filesystem::path(SHADERS_DIR);
+		m_Shaders["minimal"] = IShaderSPtr(new Shader({
+			{ ShaderType::Fragment, shadersDir / "minimal.fs" },
+			{ ShaderType::Vertex, shadersDir / "minimal.vs" }
+			}));
+		m_Shaders["sandbox"] = IShaderSPtr(new Shader({
+			{ ShaderType::Fragment, shadersDir / "sandbox.fs" },
+			{ ShaderType::Vertex, shadersDir / "sandbox.vs" }
+			}));
+		
+		IShaderSPtr spShader = m_Shaders["sandbox"];
+		spShader->Use();
+		spShader->SetUniform("ourColor", glm::vec4(0.f, 1.f, 0.f, 1.f));
+		
 
-		m_Shaders["minimal"] = shader;
 
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 		glEnableVertexAttribArray(0);

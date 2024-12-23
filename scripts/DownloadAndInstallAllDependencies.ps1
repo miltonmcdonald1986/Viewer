@@ -4,3 +4,4 @@ Remove-Item -Recurse -Path ..\lib -ErrorAction SilentlyContinue
 ./DownloadAndInstallWxFormBuilder4_2_1.ps1
 ./DownloadAndInstallGLEW2_2_0.ps1
 ./DownloadAndInstallSpdlog1_15_0.ps1
+./DownloadAndInstallGlm1_0_1.ps1

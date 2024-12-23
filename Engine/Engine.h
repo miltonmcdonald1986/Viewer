@@ -32,7 +32,7 @@ namespace Viewer
 		float m_A = 1.f;
 
 		// Shaders
-		std::map<std::string, Shader> m_Shaders;
+		std::map<std::string, IShaderSPtr> m_Shaders;
 	};
 
 }

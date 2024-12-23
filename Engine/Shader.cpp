@@ -4,19 +4,42 @@
 #include "Shader.h"
 #include "Utilities.h"
 
+#pragma region Aliases
+
+using OptShaderId = std::optional<ShaderId>;
+
+using ProgramParameter = GLint;
+using OptProgramParameter = std::optional<ProgramParameter>;
+using ProgramParameterId = GLenum;
+
+using ShaderParameter = GLint;
+using OptShaderParameter = std::optional<ShaderParameter>;
+using ShaderParameterId = GLenum;
+
+using UniformLocation = GLint;
+
+#pragma endregion
+
+#pragma region Helper functions
+
 namespace
 {
 
 	// Helper functions are declared here and defined immediately below.
-	bool AttachShaderToProgram(GLuint shader, GLuint program);
-	bool CompileShader(GLuint shader);
-	bool DeleteShader(GLuint shader);
-	bool DetachShaderFromProgram(GLuint shader, GLuint program);
-	std::optional<GLint> GetProgramParameter(GLuint program, GLenum parameter);
-	std::optional<GLint> GetShaderParameter(GLuint shader, GLenum parameter);
-	std::optional<std::string> ReadFile(const std::filesystem::path& path);
+	auto AttachShaderToProgram(ShaderId shader, ProgramId program) -> bool;
+	auto CompileFragmentShaderFromSource(const Path& fsPath) -> OptShaderId;
+	auto CompileShader(ShaderId shader) -> bool;
+	auto CompileShaderFromSource(GLenum shaderType, const Path& path) -> OptShaderId;
+	auto CompileVertexShaderFromSource(const Path& vsPath) -> OptShaderId;
+	auto CreateShader(GLenum shaderType) -> OptShaderId;
+	auto DeleteShader(ShaderId shader) -> bool;
+	auto DetachShaderFromProgram(ShaderId shader, ProgramId program) -> bool;
+	auto GetProgramParameter(ProgramId program, ProgramParameterId parameter) -> OptProgramParameter;
+	auto GetShaderParameter(ShaderId shader, ShaderParameterId parameter) -> OptShaderParameter;
+	auto ReadFile(const Path& path) -> OptString;
+	auto SetSourceCode(ShaderId shader, const String& source) -> bool;
 
-	bool AttachShaderToProgram(GLuint shader, GLuint program)
+	auto AttachShaderToProgram(ShaderId shader, ProgramId program) -> bool
 	{
 		glAttachShader(program, shader);
 		switch (glGetError())
@@ -32,7 +55,12 @@ namespace
 		return true;
 	}
 
-	bool CompileShader(GLuint shader)
+	auto CompileFragmentShaderFromSource(const Path& fsPath) -> OptShaderId
+	{
+		return CompileShaderFromSource(GL_FRAGMENT_SHADER, fsPath);
+	}
+
+	auto CompileShader(ShaderId shader) -> bool
 	{
 		glCompileShader(shader);
 
@@ -50,7 +78,10 @@ namespace
 
 		auto optCompileStatus = GetShaderParameter(shader, GL_COMPILE_STATUS);
 		if (!optCompileStatus.has_value())
+		{
+			gLogger.Error(std::format("GetShaderParameter({}, {}) failed.", shader, Viewer::Utilities::GLEnumToString(GL_COMPILE_STATUS)));
 			return false;
+		}
 
 		if (optCompileStatus.value() == GL_FALSE)
 		{
@@ -58,7 +89,10 @@ namespace
 
 			auto optInfoLogLength = GetShaderParameter(shader, GL_INFO_LOG_LENGTH);
 			if (!optInfoLogLength.has_value())
+			{
+				gLogger.Error(std::format("GetShaderParameter({}, {}) failed.", shader, Viewer::Utilities::GLEnumToString(GL_INFO_LOG_LENGTH)));
 				return false;
+			}
 
 			std::string infoLog(optInfoLogLength.value(), ' ');
 			glGetShaderInfoLog(shader, optInfoLogLength.value(), NULL, infoLog.data());
@@ -80,7 +114,66 @@ namespace
 		return true;
 	}
 
-	bool DeleteShader(GLuint shader)
+	auto CompileShaderFromSource(GLenum shaderType, const Path& path) -> OptShaderId
+	{
+		std::string source;
+		if (std::optional<std::string> optSource = ReadFile(path); optSource.has_value())
+			source = optSource.value();
+		else
+		{
+			gLogger.Error(std::format("ReadFile({}) failed.", std::filesystem::absolute(path).string()));
+			return std::nullopt;
+		}
+
+		GLuint shader = 0;
+		if (std::optional<GLuint> optId = CreateShader(shaderType); optId.has_value())
+			shader = optId.value();
+		else
+		{
+			gLogger.Error(std::format("CreateShader({}) failed.", Viewer::Utilities::GLEnumToString(shaderType)));
+			return std::nullopt;
+		}
+
+		if (!SetSourceCode(shader, source))
+		{
+			gLogger.Error(std::format("SetSourceCode({}, {}) failed.", shader, source));
+			return std::nullopt;
+		}
+
+		if (!CompileShader(shader))
+		{
+			gLogger.Error(std::format("CompileShader({}) failed.", shader));
+			return std::nullopt;
+		}
+
+		return shader;
+	}
+
+	auto CompileVertexShaderFromSource(const Path& vsPath) -> OptShaderId
+	{
+		return CompileShaderFromSource(GL_VERTEX_SHADER, vsPath);
+	}
+
+	auto CreateShader(GLenum shaderType) -> OptShaderId
+	{
+		GLuint shader = glCreateShader(shaderType);
+		if (shader == 0)
+		{
+			gLogger.OpenGLError(glGetError(), "Error creating the shader object.");
+			return std::nullopt;
+		}
+
+		switch (glGetError())
+		{
+		case GL_INVALID_ENUM:
+			gLogger.OpenGLError(GL_INVALID_ENUM, "shaderType is not an accepted value.");
+			return std::nullopt;
+		}
+
+		return shader;
+	}
+
+	auto DeleteShader(ShaderId shader) -> bool
 	{
 		glDeleteShader(shader);
 		switch (glGetError())
@@ -93,7 +186,7 @@ namespace
 		return true;
 	}
 
-	bool DetachShaderFromProgram(GLuint shader, GLuint program)
+	auto DetachShaderFromProgram(ShaderId shader, ProgramId program) -> bool
 	{
 		glDetachShader(program, shader);
 		switch (glGetError())
@@ -109,7 +202,7 @@ namespace
 		return true;
 	}
 
-	std::optional<GLint> GetProgramParameter(GLuint program, GLenum parameter)
+	auto GetProgramParameter(ProgramId program, ProgramParameterId parameter) -> OptProgramParameter
 	{
 		GLint param;
 		glGetProgramiv(program, parameter, &param);
@@ -130,7 +223,7 @@ namespace
 		return param;
 	}
 
-	std::optional<GLint> GetShaderParameter(GLuint shader, GLenum parameter)
+	auto GetShaderParameter(ShaderId shader, ShaderParameterId parameter) -> OptShaderParameter
 	{
 		GLint param;
 		glGetShaderiv(shader, parameter, &param);
@@ -151,7 +244,7 @@ namespace
 		return param;
 	}
 
-	std::optional<std::string> ReadFile(const std::filesystem::path& path)
+	auto ReadFile(const Path& path) -> OptString
 	{
 		try
 		{
@@ -172,102 +265,7 @@ namespace
 		}
 	}
 
-}
-
-namespace Viewer
-{
-
-	Shader::~Shader()
-	{
-		glDeleteProgram(m_Program);
-		switch (glGetError())
-		{
-		case GL_INVALID_VALUE:
-			gLogger.OpenGLError(GL_INVALID_VALUE, "program is not a value generated by OpenGL.");
-			break;
-		}
-	}
-
-	bool Shader::CompileShaderFromSource(GLenum shaderType, const std::filesystem::path& path)
-	{
-		GLuint* shader = GetShaderData(shaderType);
-		if (!shader)
-		{
-			gLogger.Error("GetShaderData failed.");
-			return false;
-		}
-
-		std::string source;
-		if (std::optional<std::string> optSource = ReadFile(path); optSource.has_value())
-			source = optSource.value();
-		else
-		{
-			gLogger.Error(std::format("ReadFile({}) failed.", std::filesystem::absolute(path).string()));
-			return false;
-		}
-
-		if (std::optional<GLuint> optId = CreateShader(shaderType); optId.has_value())
-			*shader = optId.value();
-		else
-		{
-			gLogger.Error(std::format("CreateShader({}) failed.", Utilities::GLEnumToString(shaderType)));
-			return false;
-		}
-
-		if (!SetSourceCode(*shader, source))
-		{
-			gLogger.Error(std::format("SetSourceCode({}, {}) failed.", *shader, source));
-			return false;
-		}
-
-		if (!CompileShader(*shader))
-		{
-			gLogger.Error(std::format("CompileShader({}) failed.", *shader));
-			return false;
-		}
-
-		return true;
-	}
-
-	std::optional<GLuint> Shader::CreateShader(GLenum shaderType)
-	{
-		GLuint shader = glCreateShader(shaderType);
-		if (shader == 0)
-		{
-			gLogger.OpenGLError(glGetError(), "Error creating the shader object.");
-			return std::nullopt;
-		}
-
-		switch (glGetError())
-		{
-		case GL_INVALID_ENUM:
-			gLogger.OpenGLError(GL_INVALID_ENUM, "shaderType is not an accepted value.");
-			return std::nullopt;
-		}
-
-		return shader;
-	}
-
-	GLuint* Shader::GetShaderData(GLenum shaderType)
-	{
-		GLuint* shader = nullptr;
-		switch (shaderType)
-		{
-		case GL_FRAGMENT_SHADER:
-			shader = &m_VertexShader;
-			break;
-		case GL_VERTEX_SHADER:
-			shader = &m_FragmentShader;
-			break;
-		default:
-			gLogger.Error(std::format("Shader class contains no data for a shader of type {}.", Utilities::GLEnumToString(shaderType)));
-			break;
-		}
-
-		return shader;
-	};
-
-	bool Shader::SetSourceCode(int shader, const std::string& source)
+	auto SetSourceCode(ShaderId shader, const String& source) -> bool
 	{
 		const char* sourceCStr = source.c_str();
 		glShaderSource(shader, 1, &sourceCStr, NULL);
@@ -285,17 +283,145 @@ namespace Viewer
 		return true;
 	}
 
-	bool Shader::CompileFragmentShaderFromSource(const std::filesystem::path& fsPath)
+}
+
+#pragma endregion
+
+namespace Viewer
+{
+
+#pragma region Construction and destruction
+
+	Shader::Shader(const ShaderSources sources)
 	{
-		return CompileShaderFromSource(GL_FRAGMENT_SHADER, fsPath);
+		std::vector<GLuint> shaders;
+		for (const auto& [type, path] : sources)
+		{
+			switch (type)
+			{
+			case ShaderType::Fragment:
+			{
+				if (std::optional<GLuint> optId = CompileFragmentShaderFromSource(path); optId.has_value())
+					shaders.push_back(optId.value());
+				else
+				{
+					gLogger.Error(std::format("CompileFragmentShaderFromSource({})", path.string()));
+					return;
+				}
+
+				break;
+			}
+			case ShaderType::Vertex:
+			{
+				if (std::optional<GLuint> optId = CompileVertexShaderFromSource(path); optId.has_value())
+					shaders.push_back(optId.value());
+				else
+				{
+					gLogger.Error(std::format("CompileVertexShaderFromSource({})", path.string()));
+					return;
+				}
+
+				break;
+			}
+			default:
+				gLogger.Error(std::format("Shader type '{}' not supported.", static_cast<size_t>(type)));
+				return;
+			}
+		}
+
+		if (!LinkProgram(shaders))
+		{
+			gLogger.Error("LinkProgram() failed.");
+			return;
+		}
+
+		// Cleanup
+		for (auto shader : shaders)
+		{
+			if (!DetachShaderFromProgram(shader, m_Program))
+			{
+				gLogger.Error(std::format("DetachShaderFromProgram({}, {}) failed.", shader, m_Program));
+				return;
+			}
+
+			if (!DeleteShader(shader))
+			{
+				gLogger.Error(std::format("DeleteShader({}) failed.", shader));
+				return;
+			}
+		}
+
+		m_Initialized = true;
 	}
 
-	bool Shader::CompileVertexShaderFromSource(const std::filesystem::path& vsPath)
+	Shader::~Shader()
 	{
-		return CompileShaderFromSource(GL_VERTEX_SHADER, vsPath);
+		glDeleteProgram(m_Program);
+		switch (glGetError())
+		{
+		case GL_INVALID_VALUE:
+			gLogger.OpenGLError(GL_INVALID_VALUE, "program is not a value generated by OpenGL.");
+			break;
+		}
 	}
 
-	bool Shader::LinkProgram()
+#pragma endregion
+
+#pragma region Public functions
+
+	auto Shader::SetUniform(const String& name, const Vec4& value) -> bool const
+	{
+		UniformLocation location = glGetUniformLocation(m_Program, name.c_str());
+		if (location == -1)
+		{
+			gLogger.Error(std::format("{} does not correspond to an active uniform variable in program, or starts with the reserved prefix \"gl_\", or is associated with an atomic counter or a named uniform block.", name));
+			return false;
+		}
+		switch (glGetError())
+		{
+		case GL_INVALID_VALUE:
+			gLogger.OpenGLError(GL_INVALID_VALUE, "program is not a value generated by OpenGL.");
+			return false;
+		case GL_INVALID_OPERATION:
+			gLogger.OpenGLError(GL_INVALID_OPERATION, "program is not a program object, or program has not been successfully linked.");
+			return false;
+		}
+
+		glUniform4f(location, value.x, value.y, value.z, value.w);
+		switch (glGetError())
+		{
+		case GL_INVALID_OPERATION:
+			gLogger.OpenGLError(GL_INVALID_OPERATION, "there is no current program object, or the size of the uniform variable declared in the shader does not match the size indicated by the glUniform command, or one of the signed or unsigned integer variants of this function is used to load a uniform variable of type float, vec2, vec3, vec4, or an array of these, or one of the floating-point variants of this function is used to load a uniform variable of type int, ivec2, ivec3, ivec4, unsigned int, uvec2, uvec3, uvec4, or an array of these, or one of the signed integer variants of this function is used to load a uniform variable of type unsigned int, uvec2, uvec3, uvec4, or an array of these, or one of the unsigned integer variants of this function is used to load a uniform variable of type int, ivec2, ivec3, ivec4, or an array of these, or location is an invalid uniform location for the current program object and location is not equal to -1, or count is greater than 1 and the indicated uniform variable is not an array variable, or a sampler is loaded using a command other than glUniform1i and glUniform1iv.");
+			return false;
+		case GL_INVALID_VALUE:
+			gLogger.OpenGLError(GL_INVALID_VALUE, "count is less than 0.");
+			return false;
+		}
+
+		return true;
+	}
+
+	auto Shader::Use() -> bool const
+	{
+		glUseProgram(m_Program);
+		switch (glGetError())
+		{
+		case GL_INVALID_VALUE:
+			gLogger.OpenGLError(GL_INVALID_VALUE, "program is neither 0 nor a value generated by OpenGL.");
+			return false;
+		case GL_INVALID_OPERATION:
+			gLogger.OpenGLError(GL_INVALID_OPERATION, "program is not a program object, or program could not be made part of current state, or transform feedback mode is active.");
+			return false;
+		}
+
+		return true;
+	}
+
+#pragma endregion
+
+#pragma region Private functions
+
+	auto Shader::LinkProgram(const ShaderIds& shaders) -> bool
 	{
 		m_Program = glCreateProgram();
 		if (m_Program == 0)
@@ -304,16 +430,13 @@ namespace Viewer
 			return false;
 		}
 
-		if (!AttachShaderToProgram(m_VertexShader, m_Program))
+		for (const auto& shader : shaders)
 		{
-			gLogger.Error(std::format("AttachShaderToProgram({}, {}) failed.", m_VertexShader, m_Program));
-			return false;
-		}
-
-		if (!AttachShaderToProgram(m_FragmentShader, m_Program))
-		{
-			gLogger.Error(std::format("AttachShaderToProgram({}, {}) failed.", m_VertexShader, m_Program));
-			return false;
+			if (!AttachShaderToProgram(shader, m_Program))
+			{
+				gLogger.Error(std::format("AttachShaderToProgram({}, {}) failed.", shader, m_Program));
+				return false;
+			}
 		}
 
 		glLinkProgram(m_Program);
@@ -329,7 +452,10 @@ namespace Viewer
 
 		auto optLinkStatus = GetProgramParameter(m_Program, GL_LINK_STATUS);
 		if (!optLinkStatus.has_value())
+		{
+			gLogger.Error(std::format("GetProgramParameter({}, {}) failed.", m_Program, Viewer::Utilities::GLEnumToString(GL_LINK_STATUS)));
 			return false;
+		}
 
 		if (optLinkStatus.value() == GL_FALSE)
 		{
@@ -358,47 +484,9 @@ namespace Viewer
 			return false;
 		}
 
-		if (!DetachShaderFromProgram(m_VertexShader, m_Program))
-		{
-			gLogger.Error(std::format("DetachShaderFromProgram({}, {}) failed.", m_VertexShader, m_Program));
-			return false;
-		}
-
-		if (!DeleteShader(m_VertexShader))
-		{
-			gLogger.Error(std::format("DeleteShader({}) failed.", m_VertexShader));
-			return false;
-		}
-
-		if (!DetachShaderFromProgram(m_FragmentShader, m_Program))
-		{
-			gLogger.Error(std::format("DetachShaderFromProgram({}, {}) failed.", m_FragmentShader, m_Program));
-			return false;
-		}
-
-		if (!DeleteShader(m_FragmentShader))
-		{
-			gLogger.Error(std::format("DeleteShader({}) failed.", m_FragmentShader));
-			return false;
-		}
-
 		return true;
 	}
 
-	bool Shader::Use() const
-	{
-		glUseProgram(m_Program);
-		switch (glGetError())
-		{
-		case GL_INVALID_VALUE:
-			gLogger.OpenGLError(GL_INVALID_VALUE, "program is neither 0 nor a value generated by OpenGL.");
-			return false;
-		case GL_INVALID_OPERATION:
-			gLogger.OpenGLError(GL_INVALID_OPERATION, "program is not a program object, or program could not be made part of current state, or transform feedback mode is active.");
-			return false;
-		}
-
-		return true;
-	}
+#pragma endregion
 
 }

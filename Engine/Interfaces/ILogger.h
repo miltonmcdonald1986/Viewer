@@ -32,7 +32,4 @@ namespace Viewer
 		virtual void OpenGLError(GLenum error, const std::string& message = "") const = 0;
 	};
 
-	using ILoggerSPtr = std::shared_ptr<ILogger>;
-	DllImpExp ILoggerSPtr CreateEngine(const std::string& name, const std::filesystem::path& dir, LogLevel flushLevel, LogLevel activeLevel);
-
 }

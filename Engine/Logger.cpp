@@ -7,7 +7,7 @@ Viewer::Logger gLogger("Engine", LOGS_DIR, Viewer::LogLevel::Warn, Viewer::LogLe
 namespace
 {
 
-	spdlog::level::level_enum ConvertLogLevel(Viewer::LogLevel level)
+	std::optional<spdlog::level::level_enum> ConvertLogLevel(Viewer::LogLevel level)
 	{
 		switch (level)
 		{
@@ -24,6 +24,8 @@ namespace
 		case Viewer::Critical:
 			return spdlog::level::critical;
 		}
+
+		return std::nullopt;
 	}
 
 }
@@ -36,12 +38,12 @@ namespace Viewer
 		m_spLogger = spdlog::basic_logger_mt(name, pathToLog.string(), true);
 		if (m_spLogger)
 		{
-			m_spLogger->flush_on(ConvertLogLevel(flushLevel));
+			m_spLogger->flush_on(ConvertLogLevel(flushLevel).value_or(spdlog::level::warn));
 
 #ifdef _DEBUG
 			m_spLogger->set_level(spdlog::level::debug);
 #else
-			m_spLogger->set_level(ConvertLogLevel(activeLevel));
+			m_spLogger->set_level(ConvertLogLevel(activeLevel).value_or(spdlog::level::info));
 #endif
 		}
 	}
@@ -90,11 +92,6 @@ namespace Viewer
 			if (!message.empty())
 				m_spLogger->info(message);
 		}
-	}
-
-	ILoggerSPtr CreateEngine(const std::string& name, const std::filesystem::path& dir, LogLevel flushLevel, LogLevel activeLevel)
-	{
-		return ILoggerSPtr(new Logger(name, dir, flushLevel, activeLevel));
 	}
 
 }

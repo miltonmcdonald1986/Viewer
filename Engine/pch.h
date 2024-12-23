@@ -23,4 +23,7 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/basic_file_sink.h"
 
+#include "glm/ext/vector_float3.hpp"
+#include "glm/ext/vector_float4.hpp"
+
 #endif //PCH_H

@@ -42,6 +42,12 @@
     <ClInclude Include="Logger.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Interfaces\IShader.h">
+      <Filter>Interface Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Alias.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
