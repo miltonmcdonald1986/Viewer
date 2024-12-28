@@ -105,6 +105,8 @@ xcopy "..\lib\glew-2.2.0\bin\Release\x64\*.dll" $(OutDir) /y</Command>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="GLCanvas.cpp" />
+    <ClCompile Include="Uniform4fEditorBase.cpp" />
+    <ClCompile Include="Uniform4fEditorUniform4fEditor.cpp" />
     <ClCompile Include="ViewerBase.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -116,6 +118,8 @@ xcopy "..\lib\glew-2.2.0\bin\Release\x64\*.dll" $(OutDir) /y</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GLCanvas.h" />
+    <ClInclude Include="Uniform4fEditorBase.h" />
+    <ClInclude Include="Uniform4fEditorUniform4fEditor.h" />
     <ClInclude Include="ViewerBase.h" />
     <ClInclude Include="ViewerMainFrame.h" />
   </ItemGroup>

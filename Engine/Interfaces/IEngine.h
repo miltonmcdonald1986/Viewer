@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include "IShader.h"
 #include "DllImpExp.h"
 
 namespace Viewer
@@ -10,13 +11,14 @@ namespace Viewer
 	{
 	public:
 		virtual ~IEngine() = default;
-		virtual void HelloTriangle() = 0;
-		virtual bool Init() = 0;
-		virtual void Render() const = 0;
-		virtual void SetBackgroundColor(float r, float g, float b, float a = 1.f) = 0;
+		virtual auto GetShader(const std::string& name) -> IShaderSPtr const = 0;
+		virtual auto HelloTriangle() -> void = 0;
+		virtual auto Init() -> bool = 0;
+		virtual auto Render() -> void const = 0;
+		virtual auto SetBackgroundColor(float r, float g, float b, float a = 1.f) -> void = 0;
 	};
 
 	using IEngineSPtr = std::shared_ptr<IEngine>;
-	DllImpExp IEngineSPtr CreateEngine();
+	DllImpExp auto CreateEngine() -> IEngineSPtr;
 
 }

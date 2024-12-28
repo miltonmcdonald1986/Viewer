@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include "glm/ext/vector_float4.hpp"
+
 namespace Viewer
 {
 

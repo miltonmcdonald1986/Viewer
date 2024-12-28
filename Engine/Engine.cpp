@@ -9,9 +9,28 @@ namespace Viewer
 #ifdef _DEBUG
 		spdlog::flush_every(std::chrono::seconds(3));
 #endif
+
+		// WARNING: Do not initialize any OpenGL related data
+		// here. Instead, initialize it in the OnInit function.
 	}
 
-	void Engine::HelloTriangle()
+	Engine::~Engine()
+	{
+		glDeleteBuffers(1, &m_idVBO);
+		glDeleteBuffers(1, &m_HelloTriangleEBO);
+		glDeleteVertexArrays(1, &m_HelloTriangleVAO);
+		spdlog::shutdown();
+	}
+
+	auto Engine::GetShader(const std::string& name) -> IShaderSPtr const
+	{
+		if (m_Shaders.contains(name))
+			return m_Shaders[name];
+		else
+			return nullptr;
+	}
+
+	auto Engine::HelloTriangle() -> void
 	{
 		m_HelloTriangle = true;
 
@@ -30,33 +49,19 @@ namespace Viewer
 		glGenVertexArrays(1, &m_HelloTriangleVAO);
 		glBindVertexArray(m_HelloTriangleVAO);
 
-		// Generate a buffer object name.
-		GLuint idVBO;
-		glGenBuffers(1, &idVBO);
+		// Generate a buffer object name
+		glGenBuffers(1, &m_idVBO);
 
 		// Create a buffer object with name VBO, and bind it
 		// to the "Vertex Attributes" buffer binding target.
-		glBindBuffer(GL_ARRAY_BUFFER, idVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, m_idVBO);
 
 		// Create a new data store for the buffer currently 
 		// bound to GL_ARRAY_BUFFER (in this case, VBO).
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-		auto shadersDir = std::filesystem::path(SHADERS_DIR);
-		m_Shaders["minimal"] = IShaderSPtr(new Shader({
-			{ ShaderType::Fragment, shadersDir / "minimal.fs" },
-			{ ShaderType::Vertex, shadersDir / "minimal.vs" }
-			}));
-		m_Shaders["sandbox"] = IShaderSPtr(new Shader({
-			{ ShaderType::Fragment, shadersDir / "sandbox.fs" },
-			{ ShaderType::Vertex, shadersDir / "sandbox.vs" }
-			}));
 		
 		IShaderSPtr spShader = m_Shaders["sandbox"];
 		spShader->Use();
-		spShader->SetUniform("ourColor", glm::vec4(0.f, 1.f, 0.f, 1.f));
-		
-
 
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 		glEnableVertexAttribArray(0);
@@ -67,17 +72,27 @@ namespace Viewer
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	}
 
-	bool Engine::Init()
+	auto Engine::Init() -> bool
 	{
 		// Initialize GLEW
 		GLenum err = glewInit();
 		if (GLEW_OK != err)
 			return false;
 
+		auto shadersDir = std::filesystem::path(SHADERS_DIR);
+		m_Shaders["minimal"] = IShaderSPtr(new Shader({
+			{ ShaderType::Fragment, shadersDir / "minimal.fs" },
+			{ ShaderType::Vertex, shadersDir / "minimal.vs" }
+			}));
+		m_Shaders["sandbox"] = IShaderSPtr(new Shader({
+			{ ShaderType::Fragment, shadersDir / "sandbox.fs" },
+			{ ShaderType::Vertex, shadersDir / "sandbox.vs" }
+			}));
+
 		return true;
 	}
 
-	void Engine::Render() const
+	auto Engine::Render() -> void const
 	{
 		if (m_HelloTriangle)
 			RenderHelloTriangle();
@@ -85,7 +100,7 @@ namespace Viewer
 			RenderEverything();
 	}
 
-	void Engine::SetBackgroundColor(float r, float g, float b, float a)
+	auto Engine::SetBackgroundColor(float r, float g, float b, float a) -> void
 	{
 		m_R = r;
 		m_G = g;
@@ -93,13 +108,13 @@ namespace Viewer
 		m_A = a;
 	}
 
-	void Engine::RenderEverything() const
+	auto Engine::RenderEverything() -> void const
 	{
 		glClearColor(m_R, m_G, m_B, m_A);
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
-	void Engine::RenderHelloTriangle() const
+	auto Engine::RenderHelloTriangle() -> void const
 	{
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -114,7 +129,7 @@ namespace Viewer
 
 	IEngineSPtr CreateEngine()
 	{
-		return std::shared_ptr<IEngine>(new Engine());
+		return std::make_shared<Engine>();
 	}
 
 }

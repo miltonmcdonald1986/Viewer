@@ -13,6 +13,16 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 
+	m_menubar1 = new wxMenuBar( 0 );
+	m_menuUniforms = new wxMenu();
+	wxMenuItem* m_menuUniform4f;
+	m_menuUniform4f = new wxMenuItem( m_menuUniforms, wxID_ANY, wxString( _("Uniform4f...") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuUniforms->Append( m_menuUniform4f );
+
+	m_menubar1->Append( m_menuUniforms, _("Uniforms") );
+
+	this->SetMenuBar( m_menubar1 );
+
 	gSizer1 = new wxGridSizer( 1, 1, 0, 0 );
 
 
@@ -20,6 +30,9 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	this->Layout();
 
 	this->Centre( wxBOTH );
+
+	// Connect Events
+	m_menuUniforms->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrame::m_menuUniform4fOnMenuSelection ), this, m_menuUniform4f->GetId());
 }
 
 MainFrame::~MainFrame()

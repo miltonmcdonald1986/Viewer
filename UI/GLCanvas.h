@@ -5,6 +5,7 @@
 #include "wx/frame.h"
 #include "wx/glcanvas.h"
 #include "wx/msgdlg.h"
+#include "wx/timer.h"
 
 class GLCanvas : public wxGLCanvas
 {
@@ -16,6 +17,7 @@ public:
 	void OnLeftDown(wxMouseEvent& event);
 	void OnPaint(wxPaintEvent& event);
 	void OnSize(wxSizeEvent& event);
+	void OnTimer(wxTimerEvent& event);
 
 private:
 	Viewer::IEngineSPtr m_spEngine = nullptr;

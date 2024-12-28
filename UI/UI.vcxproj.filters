@@ -23,6 +23,12 @@
     <ClCompile Include="GLCanvas.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Uniform4fEditorBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Uniform4fEditorUniform4fEditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ViewerMainFrame.h">
@@ -32,6 +38,12 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="GLCanvas.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Uniform4fEditorBase.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Uniform4fEditorUniform4fEditor.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
